@@ -5,8 +5,8 @@ import stringDirection from "string-direction";
 const Output = ({ content }) => {
   let generator = new HtmlGenerator({ hyphenate: false });
 
-  let outputToHTML = parse(content, { generator: generator }).htmlDocument();
-  let parsedHTML = new XMLSerializer().serializeToString(outputToHTML);
+  // let outputToHTML = parse(content, { generator: generator }).htmlDocument();
+  // let parsedHTML = new XMLSerializer().serializeToString(outputToHTML);
 
   const extractText = (str) => {
     var span = document.createElement("span");
@@ -14,19 +14,33 @@ const Output = ({ content }) => {
     return span.textContent || span.innerText;
   };
 
-  const finalHTML = (parsedHTML) => {
+  const finalHTML = () => {
     let direction = extractText(content);
     const HTMLDirection =
       stringDirection.getDirection(direction) === "ltr" ? "ltr" : "rtl";
 
-    // Add direction the the iframe html
-    let index = parsedHTML.indexOf("style") + "style= ".length;
+    try {
+      let outputToHTML = parse(content, {
+        generator: generator,
+      }).htmlDocument();
+      let parsedHTML = new XMLSerializer().serializeToString(outputToHTML);
 
-    return (
-      parsedHTML.slice(0, index) +
-      `direction:${HTMLDirection}; ` +
-      parsedHTML.slice(index)
-    );
+      // Add direction the the iframe html
+      let index = parsedHTML.indexOf("style") + "style= ".length;
+
+      return (
+        parsedHTML.slice(0, index) +
+        `direction:${HTMLDirection}; ` +
+        parsedHTML.slice(index)
+      );
+    } catch (error) {
+      const errorBody = `<h4 style="color: red;">${error}</h4>`;
+      if (error.location) {
+        return `${errorBody} at line ${error.location.start.line}`;
+      } else {
+        return errorBody;
+      }
+    }
   };
 
   return (
@@ -35,7 +49,7 @@ const Output = ({ content }) => {
         className="output-frame w-full h-full border-0"
         title="Output"
         sandbox="allow-same-origin allow-scripts"
-        srcDoc={finalHTML(parsedHTML)}
+        srcDoc={finalHTML()}
       ></iframe>
     </div>
   );
