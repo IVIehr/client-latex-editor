@@ -2,11 +2,8 @@ import React from "react";
 import { parse, HtmlGenerator } from "latex.js";
 import stringDirection from "string-direction";
 
-const Output = ({ content }) => {
+const Output = ({ content, setSave }) => {
   let generator = new HtmlGenerator({ hyphenate: false });
-
-  // let outputToHTML = parse(content, { generator: generator }).htmlDocument();
-  // let parsedHTML = new XMLSerializer().serializeToString(outputToHTML);
 
   const extractText = (str) => {
     var span = document.createElement("span");
@@ -24,6 +21,9 @@ const Output = ({ content }) => {
         generator: generator,
       }).htmlDocument();
       let parsedHTML = new XMLSerializer().serializeToString(outputToHTML);
+      if (setSave) {
+        console.log(parsedHTML);
+      }
 
       // Add direction the the iframe html
       let index = parsedHTML.indexOf("style") + "style= ".length;
@@ -48,7 +48,6 @@ const Output = ({ content }) => {
       <iframe
         className="output-frame w-full h-full border-0"
         title="Output"
-        sandbox="allow-same-origin allow-scripts"
         srcDoc={finalHTML()}
       ></iframe>
     </div>
