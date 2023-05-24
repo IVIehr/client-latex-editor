@@ -35,19 +35,19 @@ const Editor = () => {
           </div>
           <div>
             <button
-              className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded mr-2"
+              className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded mr-2 focus:outline-none"
               onClick={handleCopyToClipboard}
             >
               <FaClipboard />
             </button>
             <button
-              className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded"
+              className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded focus:outline-none"
               onClick={handleClean}
             >
               <FaTrash />
             </button>
             <button
-              className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded"
+              className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded focus:outline-none"
               onClick={handleSave}
             >
               <FaSave />
@@ -70,7 +70,7 @@ const Editor = () => {
         </div>
       </div>
       <div className="w-1/2 bg-gray-200">
-        <Output content={content} setSave={save} />
+        <Output content={content} saveIt={save} />
       </div>
     </>
   );

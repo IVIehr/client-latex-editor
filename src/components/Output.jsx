@@ -2,7 +2,7 @@ import React from "react";
 import { parse, HtmlGenerator } from "latex.js";
 import stringDirection from "string-direction";
 
-const Output = ({ content, setSave }) => {
+const Output = ({ content, saveIt }) => {
   let generator = new HtmlGenerator({ hyphenate: false });
 
   const extractText = (str) => {
@@ -17,22 +17,23 @@ const Output = ({ content, setSave }) => {
       stringDirection.getDirection(direction) === "ltr" ? "ltr" : "rtl";
 
     try {
+      // Parse latex to HTML
       let outputToHTML = parse(content, {
         generator: generator,
       }).htmlDocument();
+
+      // Convert HTML to string
       let parsedHTML = new XMLSerializer().serializeToString(outputToHTML);
-      if (setSave) {
-        console.log(parsedHTML);
+
+      // Extract the content of <body> tag from string output
+      var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(parsedHTML)[1];
+
+      // Save the string output
+      if (saveIt) {
+        console.log(content);
       }
 
-      // Add direction the the iframe html
-      let index = parsedHTML.indexOf("style") + "style= ".length;
-
-      return (
-        parsedHTML.slice(0, index) +
-        `direction:${HTMLDirection}; ` +
-        parsedHTML.slice(index)
-      );
+      return `<div style="direction:${HTMLDirection}; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;">${bodyHtml}</div>`;
     } catch (error) {
       const errorBody = `<h4 style="color: red;">${error}</h4>`;
       if (error.location) {
