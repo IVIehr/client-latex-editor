@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaClipboard, FaTrash, FaSave } from "react-icons/fa";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
@@ -7,11 +7,7 @@ import "codemirror/mode/stex/stex";
 import Output from "./Output";
 
 const Editor = () => {
-  const [content, setContent] = useState(
-    "\\documentclass{article}\n\n\\begin{document}\n\n\\section{بخش}\nاین یک نمونه سند لاتکس است\n\n\\subsection{زیربخش}\nاین یک نمونه متن در زیربخش است.\n\n\\end{document}"
-  );
-
-  const [save, setSave] = useState(false);
+  const [content, setContent] = useState('');
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(content);
@@ -22,7 +18,40 @@ const Editor = () => {
   };
 
   const handleSave = () => {
-    setSave(true);
+    const message = {
+      action: "save-content",
+      content: content,
+    };
+    window.parent.postMessage(message, "*");
+  };
+
+  useEffect(() => {
+    handleSave();
+    window.addEventListener("message", readEditorData, false);
+
+    return () => {
+      window.removeEventListener("message", readEditorData);
+    };
+  }, [content]);
+
+  const readEditorData = async (event) => {
+    const { action, key, value } = event.data;
+    console.log("message from parent recieved:", event.data);
+
+    switch (action) {
+      case "get-data":
+        break;
+      case "set-data":
+        if (value) {
+          setContent(value);
+        }
+        break;
+      case "load":
+        if (value) {
+          console.log("action in load", action);
+        }
+        break;
+    }
   };
 
   return (
@@ -46,12 +75,6 @@ const Editor = () => {
             >
               <FaTrash />
             </button>
-            <button
-              className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded focus:outline-none"
-              onClick={handleSave}
-            >
-              <FaSave />
-            </button>
           </div>
         </div>
         <div className="editorContainer">
@@ -64,13 +87,12 @@ const Editor = () => {
             }}
             onBeforeChange={(editor, data, code) => {
               setContent(code);
-              setSave(false);
             }}
           />
         </div>
       </div>
       <div className="w-1/2 bg-gray-200">
-        <Output content={content} saveIt={save} />
+        <Output content={content}/>
       </div>
     </>
   );
