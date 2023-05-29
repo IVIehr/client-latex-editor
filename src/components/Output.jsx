@@ -2,7 +2,7 @@ import React from "react";
 import { parse, HtmlGenerator } from "latex.js";
 import stringDirection from "string-direction";
 
-const Output = ({ content, saveIt }) => {
+const Output = ({ content }) => {
   let generator = new HtmlGenerator({ hyphenate: false });
 
   const extractText = (str) => {
@@ -27,11 +27,6 @@ const Output = ({ content, saveIt }) => {
 
       // Extract the content of <body> tag from string output
       var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(parsedHTML)[1];
-
-      // Save the string output
-      if (saveIt) {
-        console.log(content);
-      }
 
       return `<div style="direction:${HTMLDirection}; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;">${bodyHtml}</div>`;
     } catch (error) {
