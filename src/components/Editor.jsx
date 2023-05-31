@@ -6,8 +6,9 @@ import "codemirror/theme/material.css";
 import "codemirror/mode/stex/stex";
 import Output from "./Output";
 
-const Editor = () => {
+const Editor = ({loading, setLoading}) => {
   const [content, setContent] = useState('');
+  
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(content);
@@ -26,17 +27,18 @@ const Editor = () => {
   };
 
   useEffect(() => {
-    handleSave();
+    // handleSave();
     window.addEventListener("message", readEditorData, false);
 
     return () => {
       window.removeEventListener("message", readEditorData);
     };
-  }, [content]);
+  }, []);
 
   const readEditorData = async (event) => {
     const { action, key, value } = event.data;
     console.log("message from parent recieved:", event.data);
+    debugger;
 
     switch (action) {
       case "get-data":
@@ -47,10 +49,8 @@ const Editor = () => {
         }
         break;
       case "load":
-        if (value) {
-          console.log("action in load", action);
-        }
-        break;
+        console.log("action in load", action);
+      break;
     }
   };
 
@@ -98,4 +98,12 @@ const Editor = () => {
   );
 };
 
-export default Editor;
+// export default Editor;
+
+
+const WrapperEditor = () =>{
+const [loading, setLoading] = useState(false);
+
+return(<Editor loading={loading} setLoading={setLoading}/>);
+}
+export default WrapperEditor;
