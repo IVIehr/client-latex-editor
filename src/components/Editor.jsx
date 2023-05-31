@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { FaClipboard, FaTrash, FaSave } from "react-icons/fa";
+import { useEffect, useState, useRef } from "react";
+import { FaClipboard, FaTrash } from "react-icons/fa";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 import "codemirror/mode/stex/stex";
 import Output from "./Output";
 
-const Editor = ({loading, setLoading}) => {
-  const [content, setContent] = useState('');
-  
+const Editor = ({ loading, setLoading }) => {
+  const [content, setContent] = useState("");
+  const contentRef = useRef(null);
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(content);
@@ -18,16 +18,11 @@ const Editor = ({loading, setLoading}) => {
     setContent("");
   };
 
-  const handleSave = () => {
-    const message = {
-      action: "save-content",
-      content: content,
-    };
-    window.parent.postMessage(message, "*");
-  };
+  useEffect(() => {
+    contentRef.current = content;
+  }, [content]);
 
   useEffect(() => {
-    // handleSave();
     window.addEventListener("message", readEditorData, false);
 
     return () => {
@@ -38,19 +33,30 @@ const Editor = ({loading, setLoading}) => {
   const readEditorData = async (event) => {
     const { action, key, value } = event.data;
     console.log("message from parent recieved:", event.data);
-    debugger;
+    console.log("content ref", contentRef);
 
     switch (action) {
       case "get-data":
+        event.source.postMessage(
+          {
+            action,
+            key,
+            value: contentRef.current,
+          },
+          "*"
+        );
         break;
       case "set-data":
         if (value) {
-          setContent(value);
+          contentRef.current = value;
         }
         break;
       case "load":
         console.log("action in load", action);
-      break;
+        if (value) {
+          setContent(value);
+        }
+        break;
     }
   };
 
@@ -92,18 +98,15 @@ const Editor = ({loading, setLoading}) => {
         </div>
       </div>
       <div className="w-1/2 bg-gray-200">
-        <Output content={content}/>
+        <Output content={content} />
       </div>
     </>
   );
 };
 
-// export default Editor;
+const WrapperEditor = () => {
+  const [loading, setLoading] = useState(false);
 
-
-const WrapperEditor = () =>{
-const [loading, setLoading] = useState(false);
-
-return(<Editor loading={loading} setLoading={setLoading}/>);
-}
+  return <Editor loading={loading} setLoading={setLoading} />;
+};
 export default WrapperEditor;
