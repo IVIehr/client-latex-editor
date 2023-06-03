@@ -5,9 +5,11 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 import "codemirror/mode/stex/stex";
 import Output from "./Output";
+import RenderIf from "../renderif";
 
-const Editor = ({ loading, setLoading }) => {
+const Editor = () => {
   const [content, setContent] = useState("");
+  const [preview, setPreview] = useState(false);
   const contentRef = useRef(null);
 
   const handleCopyToClipboard = () => {
@@ -32,9 +34,6 @@ const Editor = ({ loading, setLoading }) => {
 
   const readEditorData = async (event) => {
     const { action, key, value } = event.data;
-    console.log("message from parent recieved:", event.data);
-    console.log("content ref", contentRef);
-
     switch (action) {
       case "get-data":
         event.source.postMessage(
@@ -48,65 +47,67 @@ const Editor = ({ loading, setLoading }) => {
         break;
       case "set-data":
         if (value) {
-          contentRef.current = value;
+          setContent(value);
         }
         break;
       case "load":
-        console.log("action in load", action);
         if (value) {
           setContent(value);
         }
+        setPreview(true);
+        break;
+      case "preview":
+        setPreview(false);
+        break;
+      case "edit":
+        setPreview(true);
         break;
     }
   };
 
   return (
-    <>
-      <div className="w-1/2 bg-violet-600 text-white flex flex-col flex-1">
-        <div className="flex justify-between bg-violet-600 p-2">
-          <div className="flex items-center">
-            <span className="text-violet-50 text-lg font-bold">LaTeX</span>
-            <span className="text-gray-200 text-sm ml-1">ویرایشگر</span>
+    <div className="w-full flex">
+      <RenderIf isTrue={preview}>
+        <div className="w-1/2 bg-violet-600 text-white flex flex-col flex-1">
+          <div className="flex justify-between bg-violet-600 p-2">
+            <div className="flex items-center">
+              <span className="text-violet-50 text-lg font-bold">LaTeX</span>
+              <span className="text-gray-200 text-sm ml-1">ویرایشگر</span>
+            </div>
+            <div>
+              <button
+                className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded mr-2 focus:outline-none"
+                onClick={handleCopyToClipboard}
+              >
+                <FaClipboard />
+              </button>
+              <button
+                className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded focus:outline-none"
+                onClick={handleClean}
+              >
+                <FaTrash />
+              </button>
+            </div>
           </div>
-          <div>
-            <button
-              className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded mr-2 focus:outline-none"
-              onClick={handleCopyToClipboard}
-            >
-              <FaClipboard />
-            </button>
-            <button
-              className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded focus:outline-none"
-              onClick={handleClean}
-            >
-              <FaTrash />
-            </button>
+          <div className="editorContainer">
+            <CodeMirror
+              className="CodeMirror"
+              value={content}
+              options={{
+                mode: "stex",
+                lineNumbers: true,
+              }}
+              onBeforeChange={(editor, data, code) => {
+                setContent(code);
+              }}
+            />
           </div>
         </div>
-        <div className="editorContainer">
-          <CodeMirror
-            className="CodeMirror"
-            value={content}
-            options={{
-              mode: "stex",
-              lineNumbers: true,
-            }}
-            onBeforeChange={(editor, data, code) => {
-              setContent(code);
-            }}
-          />
-        </div>
-      </div>
-      <div className="w-1/2 bg-gray-200">
+      </RenderIf>
+      <div className={`bg-gray-200 flex-1`}>
         <Output content={content} />
       </div>
-    </>
+    </div>
   );
 };
-
-const WrapperEditor = () => {
-  const [loading, setLoading] = useState(false);
-
-  return <Editor loading={loading} setLoading={setLoading} />;
-};
-export default WrapperEditor;
+export default Editor;
