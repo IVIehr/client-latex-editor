@@ -10,6 +10,7 @@ import RenderIf from "../renderif";
 const Editor = () => {
   const [content, setContent] = useState("");
   const [preview, setPreview] = useState(false);
+  const saveRef = useRef(null);
   const contentRef = useRef(null);
 
   const handleCopyToClipboard = () => {
@@ -22,6 +23,12 @@ const Editor = () => {
 
   useEffect(() => {
     contentRef.current = content;
+    if(saveRef){
+      saveRef.current = false;
+    }
+    else{
+      saveRef.current = true;
+    }
   }, [content]);
 
   useEffect(() => {
@@ -32,10 +39,20 @@ const Editor = () => {
     };
   }, []);
 
+  useEffect(() => {
+    window.addEventListener("beforeunload", (event) => {
+      if (!saveRef.current) {
+        event.preventDefault();
+        event.returnValue = "sure to save?";
+      }
+    });
+  }, [saveRef]);
+
   const readEditorData = async (event) => {
     const { action, key, value } = event.data;
     switch (action) {
       case "get-data":
+        saveRef.current = true;
         event.source.postMessage(
           {
             action,
