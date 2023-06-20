@@ -1,8 +1,9 @@
+/* eslint-disable no-undef */
 import { useEffect, useState, useRef } from "react";
 import { FaClipboard, FaTrash } from "react-icons/fa";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
-import "codemirror/theme/material.css";
+import "codemirror/theme/base16-light.css";
 import "codemirror/mode/stex/stex";
 import Output from "./Output";
 import RenderIf from "../renderif";
@@ -113,6 +114,7 @@ const Editor = () => {
               options={{
                 mode: "stex",
                 lineNumbers: true,
+                theme: 'base16-light',
               }}
               onBeforeChange={(editor, data, code) => {
                 setContent(code);
