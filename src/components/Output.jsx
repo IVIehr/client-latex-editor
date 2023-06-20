@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 import { parse, HtmlGenerator } from "latex.js";
 import stringDirection from "string-direction";
 
@@ -28,7 +28,7 @@ const Output = ({ content }) => {
       // Extract the content of <body> tag from string output
       var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(parsedHTML)[1];
 
-      return `<div style="direction:${HTMLDirection}; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;">${bodyHtml}</div>`;
+      return `<div style="direction:${HTMLDirection}; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; margin: auto; margin-top:50px; width:70%; font-size:10pt">${bodyHtml}</div>`;
     } catch (error) {
       const errorBody = `<h4 style="color: red;">${error}</h4>`;
       if (error.location) {
@@ -40,12 +40,12 @@ const Output = ({ content }) => {
   };
 
   return (
-    <div className="h-screen bg-violet-50 p-4">
-      <iframe
-        className="output-frame w-full h-full border-0"
-        title="Output"
-        srcDoc={finalHTML()}
-      ></iframe>
+    <div className="h-screen bg-violet-50">
+        <iframe
+          className="output-frame w-full h-full border-0 bg-white"
+          title="Output"
+          srcDoc={finalHTML()}
+        ></iframe>
     </div>
   );
 };
