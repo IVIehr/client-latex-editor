@@ -89,10 +89,6 @@ const Editor = () => {
         <div className="w-1/2 bg-violet-600 text-white flex flex-col flex-1">
           <div className="flex justify-between bg-violet-600 p-2">
             <div className="flex items-center">
-              <span className="text-violet-50 text-lg font-bold">LaTeX</span>
-              <span className="text-gray-200 text-sm ml-1">ویرایشگر</span>
-            </div>
-            <div>
               <button
                 className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded mr-2 focus:outline-none"
                 onClick={handleCopyToClipboard}
@@ -124,7 +120,7 @@ const Editor = () => {
         </div>
       </RenderIf>
       <div className={`bg-gray-200 flex-1`}>
-        <Output content={content} />
+        <Output content={content} previewMode={!preview} />
       </div>
     </div>
   );
