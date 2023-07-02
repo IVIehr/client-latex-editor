@@ -108,7 +108,8 @@ const Output = ({ content, previewMode }) => {
             background: white;
             margin: auto;
             width:${documentWidth};
-            font-size:10pt"
+            box-shadow: 0 0px 8px 0px #888888ab;
+            font-size:10pt";
             >
             ${bodyHtml}
           </div>
