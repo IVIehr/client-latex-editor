@@ -8,6 +8,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import RenderIf from "../renderif";
 import html2pdf from "html2pdf.js";
+import { ESize } from "./enum";
 
 const Output = ({ content, previewMode }) => {
   const [documentWidth, setDocumentWidth] = useState("75%");
@@ -158,11 +159,11 @@ const Output = ({ content, previewMode }) => {
                               : "text-gray-900"
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                           onClick={() => {
-                            resize("14.8cm");
-                            setSize("a5");
+                            resize(ESize.letter);
+                            setSize("letter");
                           }}
                         >
-                          A5
+                          Letter
                         </button>
                       )}
                     </Menu.Item>
@@ -175,7 +176,24 @@ const Output = ({ content, previewMode }) => {
                               : "text-gray-900"
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                           onClick={() => {
-                            resize("21cm");
+                            resize(ESize.tabloid);
+                            setSize("tabloid");
+                          }}
+                        >
+                          Tabloid
+                        </button>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active
+                              ? "bg-violet-500 text-white"
+                              : "text-gray-900"
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          onClick={() => {
+                            resize(ESize.A4);
                             setSize("a4");
                           }}
                         >
@@ -192,11 +210,11 @@ const Output = ({ content, previewMode }) => {
                               : "text-gray-900"
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                           onClick={() => {
-                            resize("21.6cm");
-                            setSize("letter");
+                            resize(ESize.A5);
+                            setSize("a5");
                           }}
                         >
-                          Letter
+                          A5
                         </button>
                       )}
                     </Menu.Item>
