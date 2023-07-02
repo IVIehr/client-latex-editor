@@ -27,7 +27,7 @@ const Output = ({ content, previewMode }) => {
 
   const handleExportPdf = (size) => {
     const opt = {
-      margin: [2, 0],
+      margin: [1, 0],
       filename: "latex_output.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
@@ -36,13 +36,16 @@ const Output = ({ content, previewMode }) => {
         orientation: "portrait",
         format: size,
       },
+      pagebreak: { mode: "avoid-all" },
     };
 
     const iframeDocument = iframeRef.current.contentDocument;
-    const headingElements = iframeDocument.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const headingElements = iframeDocument.querySelectorAll(
+      "h1, h2, h3, h4, h5, h6"
+    );
 
     headingElements.forEach((heading) => {
-      heading.style.fontWeight = '700'; // Set the desired font weight
+      heading.style.fontWeight = "700"; // Set the desired font weight
     });
 
     html2pdf().set(opt).from(iframeDocument.body).save();
@@ -71,7 +74,7 @@ const Output = ({ content, previewMode }) => {
       // Extract the content of <body> tag from string output
       var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(parsedHTML)[1];
 
-      return `<div style="direction:${HTMLDirection}; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; padding:0cm 2cm 1.5cm 2cm; margin: auto; background: white; width:${documentWidth}; font-size:10pt">${bodyHtml}</div>`;
+      return `<div style="direction:${HTMLDirection}; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; padding:1.5cm 2cm; margin: auto; background: white; width:${documentWidth}; font-size:10pt">${bodyHtml}</div>`;
     } catch (error) {
       const errorBody = `<h4 style="color: red;">${error}</h4>`;
       if (error.location) {
