@@ -10,7 +10,7 @@ import RenderIf from "../renderif";
 
 const Editor = () => {
   const [content, setContent] = useState("");
-  const [preview, setPreview] = useState(false);
+  const [preview, setPreview] = useState(true);
   const saveRef = useRef(null);
   const contentRef = useRef(null);
 

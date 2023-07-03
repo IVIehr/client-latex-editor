@@ -12,7 +12,7 @@ import { ESize, EPaper } from "./enum";
 
 const Output = ({ content, previewMode }) => {
   const [documentWidth, setDocumentWidth] = useState("75%");
-  const [documentHeight, setDocumentHeight] = useState("18cm");
+  const [documentHeight, setDocumentHeight] = useState("20cm");
   const [size, setSize] = useState(EPaper.A4);
   let generator = new HtmlGenerator({ hyphenate: false });
   const iframeRef = useRef(null);
@@ -20,7 +20,7 @@ const Output = ({ content, previewMode }) => {
   useEffect(() => {
     if (!previewMode) {
       setDocumentWidth("75%");
-      setDocumentHeight("18cm");
+      setDocumentHeight("20cm");
       setSize(EPaper.A4);
     }
   }, [previewMode]);
