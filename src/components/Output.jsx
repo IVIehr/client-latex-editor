@@ -8,65 +8,26 @@ import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import RenderIf from "../renderif";
 import html2pdf from "html2pdf.js";
-import { ESize } from "./enum";
+import { ESize, EPaper } from "./enum";
 
 const Output = ({ content, previewMode }) => {
   const [documentWidth, setDocumentWidth] = useState("75%");
-  const [size, setSize] = useState("a4");
+  const [documentHeight, setDocumentHeight] = useState("18cm");
+  const [size, setSize] = useState(EPaper.A4);
   let generator = new HtmlGenerator({ hyphenate: false });
   const iframeRef = useRef(null);
 
   useEffect(() => {
     if (!previewMode) {
       setDocumentWidth("75%");
+      setDocumentHeight("18cm");
+      setSize(EPaper.A4);
     }
   }, [previewMode]);
 
-  const resize = (amount) => {
-    setDocumentWidth(amount);
-  };
-
-  const exportPdf = () => {
-    const iframeDocument = iframeRef.current.contentDocument;
-    const headingElements = iframeDocument.querySelectorAll(
-      "h1, h2, h3, h4, h5, h6"
-    );
-    const htmltest = iframeDocument.querySelector(".test");
-
-    const opt = {
-      margin: [1.5, 2],
-      filename: "latex_output.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: {
-        unit: "cm",
-        orientation: "portrait",
-        format: size,
-      },
-      pagebreak: { mode: "avoid-all" },
-    };
-  
-    headingElements.forEach((heading) => {
-      heading.style.fontWeight = "700"; // Set the desired font weight
-    });
-  
-    // Temporarily remove padding from iframe's body
-    const originalPadding = htmltest.style.padding;
-    htmltest.style.padding = "0";
-  
-    const iframeHtml = iframeDocument.documentElement.innerHTML;
-  
-    const iframeContainer = document.createElement("div");
-    iframeContainer.innerHTML = iframeHtml;
-  
-    // Restore original padding for iframe's body
-    htmltest.style.padding = originalPadding;
-  
-    // Adjust content width to fit within the page boundaries
-    const contentContainer = iframeContainer.querySelector(".test");
-    contentContainer.style.width = "100%"; // Set the desired width
-    
-    html2pdf().set(opt).from(iframeContainer).save();
+  const resize = (paper) => {
+    setDocumentWidth(paper.width);
+    setDocumentHeight(paper.height);
   };
 
   const extractText = (str) => {
@@ -90,9 +51,9 @@ const Output = ({ content, previewMode }) => {
       let parsedHTML = new XMLSerializer().serializeToString(outputToHTML);
 
       // Extract the content of <body> tag from string output
-      var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(parsedHTML)[1];
+      var bodyHTML = /<body.*?>([\s\S]*)<\/body>/.exec(parsedHTML)[1];
 
-      var completeHtml = `
+      var completeHTML = `
       <!DOCTYPE html>
       <html lang="en">
         <head>
@@ -101,24 +62,25 @@ const Output = ({ content, previewMode }) => {
           <title>latex output</title>
         </head>
         <body>
-          <div class="test"
+          <div class="main"
             style="direction:${HTMLDirection};
             font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
             padding:1.5cm 2cm;
             background: white;
             margin: auto;
-            width:${documentWidth};
+            margin-bottom: 1.5cm;
+            width: ${documentWidth};
+            min-height: ${documentHeight};
             box-shadow: 0 0px 8px 0px #888888ab;
             font-size:10pt";
             >
-            ${bodyHtml}
+            ${bodyHTML}
           </div>
         </body>
       </html>`;
 
-      return completeHtml;
+      return completeHTML;
 
-      // return `<div style="direction:${HTMLDirection}; font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; padding:1.5cm 2cm; margin: auto; background: white; width:${documentWidth}; font-size:10pt">${bodyHtml}</div>`;
     } catch (error) {
       const errorBody = `<h4 style="color: red;">${error}</h4>`;
       if (error.location) {
@@ -127,6 +89,49 @@ const Output = ({ content, previewMode }) => {
         return errorBody;
       }
     }
+  };
+
+  const exportPdf = () => {
+    const iframeDocument = iframeRef.current.contentDocument;
+    const headingElements = iframeDocument.querySelectorAll(
+      "h1, h2, h3, h4, h5, h6"
+    );
+    const divInBody = iframeDocument.querySelector(".main");
+
+    const opt = {
+      margin: [1.5, 2],
+      filename: "latex_output.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: {
+        unit: "cm",
+        orientation: "portrait",
+        format: size,
+      },
+      pagebreak: { mode: "avoid-all" },
+    };
+
+    headingElements.forEach((heading) => {
+      heading.style.fontWeight = "700"; // Set the desired font weight
+    });
+
+    // Temporarily remove padding from iframe's body
+    const originalPadding = divInBody.style.padding;
+    divInBody.style.padding = "0";
+
+    const iframeHtml = iframeDocument.documentElement.innerHTML;
+
+    const iframeContainer = document.createElement("div");
+    iframeContainer.innerHTML = iframeHtml;
+
+    // Restore original padding for iframe's body
+    divInBody.style.padding = originalPadding;
+
+    // Adjust content width to fit within the page boundaries
+    const contentContainer = iframeContainer.querySelector(".main");
+    contentContainer.style.width = "100%";
+
+    html2pdf().set(opt).from(iframeContainer).save();
   };
 
   return (
@@ -161,7 +166,7 @@ const Output = ({ content, previewMode }) => {
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                           onClick={() => {
                             resize(ESize.letter);
-                            setSize("letter");
+                            setSize(EPaper.letter);
                           }}
                         >
                           Letter
@@ -178,7 +183,7 @@ const Output = ({ content, previewMode }) => {
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                           onClick={() => {
                             resize(ESize.tabloid);
-                            setSize("tabloid");
+                            setSize(EPaper.tabloid);
                           }}
                         >
                           Tabloid
@@ -195,7 +200,7 @@ const Output = ({ content, previewMode }) => {
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                           onClick={() => {
                             resize(ESize.A4);
-                            setSize("a4");
+                            setSize(EPaper.A4);
                           }}
                         >
                           A4
@@ -212,7 +217,7 @@ const Output = ({ content, previewMode }) => {
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                           onClick={() => {
                             resize(ESize.A5);
-                            setSize("a5");
+                            setSize(EPaper.A5);
                           }}
                         >
                           A5
