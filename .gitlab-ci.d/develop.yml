@@ -1,0 +1,43 @@
+stages:
+  - prerequisites
+  - build_develop
+  - update_develop
+
+Create npmrc file:
+  stage: prerequisites
+  tags: 
+    - develop
+  only:
+    - develop
+  script:
+    - docker login $NEXUS_REPOSITORY -u $NEXUS_USERNAME -p $NEXUS_PASSWORD
+    - echo "unsafe-perm=true" > .npmrc
+    - echo "registry = http://10.60.110.23:8081/repository/npm-proxy/" >> .npmrc
+    - echo "_auth = $NPM_TOKEN" >> .npmrc
+  artifacts:
+    paths:
+    - .npmrc
+
+
+Build and Transfer Docker Image to SAKKU_REGISTRY_PARDIS:
+  stage: build_develop
+  tags:
+    - develop
+  only:
+    - develop
+  script:
+    - docker build -t $SAKKU_REGISTRY_PARDIS/$PROJECT_NAME:latest .
+    - docker login registry.sakku-pardis.ir -u $SAKKU_EMAIL -p $SAKKU_PASSWORD_PARDIS
+    - docker push $SAKKU_REGISTRY_PARDIS/$PROJECT_NAME:latest
+    - docker logout registry.sakku-pardis.ir
+    - docker rmi  $SAKKU_REGISTRY_PARDIS/$PROJECT_NAME:latest
+    - docker image prune -f --filter label=stage=builder
+
+Update application on SAKKU_PARDIS :
+  stage: update_develop
+  tags:
+    - develop
+  only:
+    - develop
+  script:
+    - 'curl -X GET "https://api.sakku-pardis.ir/app/$SAKKU_APPID/restart?tagStart=test1&tagStop=test1" -H  "accept: */*" -H  "Authorization: $SAKKU_TOKEN_PARDIS"' 

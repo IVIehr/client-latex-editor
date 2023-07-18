@@ -1,0 +1,30 @@
+workflow:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "web" '
+variables:
+    GIT_STRATEGY: clone
+    SAKKU_REGISTRY_PARDIS: 'registry.sakku-pardis.ir/$SAKKU_USERNAME'
+    SAKKU_REGISTRY_SANDBOX: 'registry.sakkusb.ir/$SAKKU_USERNAME'
+    SAKKU_REGISTRY_KHATAM: 'registry.sakku-khatam.ir/$SAKKU_USERNAME'
+    NEXUS_REPOSITORY: '10.60.110.23:8138/repository/applicationplatform-docker-hosted'
+develop:
+    trigger:
+        include: .gitlab-ci.d/develop.yml
+        strategy: depend
+    rules:
+        - if: $CI_COMMIT_BRANCH == "DevOps/develop"
+          when: always
+sandbox:
+    trigger:
+        include: .gitlab-ci.d/sandbox.yml
+        strategy: depend
+    rules:
+        - if: $CI_COMMIT_BRANCH == "sandbox"
+          when: always
+production:
+    trigger:
+        include: .gitlab-ci.d/production.yml
+        strategy: depend
+    rules:
+        - if: $CI_COMMIT_BRANCH =~ /\d+\.\d+\.\d+\.\d+\-p$/
+          when: always
