@@ -75,17 +75,17 @@ const Editor = () => {
         setPreview(true);
         break;
       case "preview":
-        setPreview(false);
+        setPreview(true);
         break;
       case "edit":
-        setPreview(true);
+        setPreview(false);
         break;
     }
   };
 
   return (
     <div className="w-full flex">
-      <RenderIf isTrue={preview}>
+      <RenderIf isTrue={!preview}>
         <div className="w-1/2 bg-violet-600 text-white flex flex-col flex-1">
           <div className="flex justify-between bg-violet-600 p-2">
             <div className="flex items-center">
@@ -120,7 +120,7 @@ const Editor = () => {
         </div>
       </RenderIf>
       <div className={`bg-gray-200 flex-1`}>
-        <Output content={content} previewMode={!preview} />
+        <Output content={content} previewMode={preview} />
       </div>
     </div>
   );
