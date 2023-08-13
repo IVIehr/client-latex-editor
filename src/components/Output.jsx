@@ -6,9 +6,9 @@ import { RiFilePaper2Fill } from "react-icons/ri";
 import { HiDownload } from "react-icons/hi";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import RenderIf from "../renderif";
+import RenderIf from "../extra/renderIf";
 import html2pdf from "html2pdf.js";
-import { ESize, EPaper } from "./enum";
+import { ESize, EPaper } from "../extra/enum";
 
 const Output = ({ content, previewMode }) => {
   const [documentWidth, setDocumentWidth] = useState("75%");
