@@ -1,33 +1,89 @@
 /* eslint-disable no-undef */
 import { useEffect, useState, useRef } from "react";
-import { FaClipboard, FaTrash } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { Controlled as CodeMirror } from "react-codemirror2";
+import Output from "./Output";
+import RenderIf from "../extra/renderIf";
+import ToolbarButton from "../extra/toolbar/toolbarButton";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/base16-light.css";
 import "codemirror/mode/stex/stex";
-import Output from "./Output";
-import RenderIf from "../renderif";
 
 const Editor = () => {
   const [content, setContent] = useState("");
   const [preview, setPreview] = useState(true);
   const saveRef = useRef(null);
   const contentRef = useRef(null);
-
-  const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(content);
-  };
+  const editorRef = useRef(null);
 
   const handleClean = () => {
     setContent("");
   };
 
+  const handleStyling = (styling) => {
+    var type;
+    switch (styling) {
+      case "bold":
+        type = "\\textbf";
+        break;
+      case "italic":
+        type = "\\textit";
+        break;
+      case "underline":
+        type = "\\underline";
+    }
+    const editor = editorRef.current.editor;
+    const selectedText = editor.getSelection();
+
+    if (selectedText) {
+      const modifiedText = `${type}{${selectedText}}`;
+      editor.replaceSelection(modifiedText);
+    } else {
+      editor.replaceSelection(`${type}{}`);
+    }
+  };
+
+  const handleLink = () => {
+    const editor = editorRef.current.editor;
+    const selectedText = editor.getSelection();
+
+    if (selectedText) {
+      const modifiedText = `\\url{${selectedText}}`;
+      editor.replaceSelection(modifiedText);
+    }
+  };
+
+  const handleList = (type) => {
+    const editor = editorRef.current.editor;
+    const selectedText = editor.getSelection();
+
+    if (selectedText) {
+      const lines = selectedText.split("\n");
+      const modifiedLines = lines.map((line) => `\\item ${line}`).join("\n");
+      const modifiedText = `\\begin{${type}}\n${modifiedLines}\n\\end{${type}}`;
+      editor.replaceSelection(modifiedText);
+    } else {
+      editor.replaceSelection(`\\begin{${type}}\n\\item \n\\end{${type}}`);
+    }
+  };
+
+  const handleCommand = (command) => {
+    const editor = editorRef.current.editor;
+    const selectedText = editor.getSelection();
+
+    if (selectedText) {
+      const modifiedText = `\\begin{${command}}\n${selectedText}\n\\end{${command}}`;
+      editor.replaceSelection(modifiedText);
+    } else {
+      editor.replaceSelection(`\\begin{${command}}\n\n\\end{${command}}`);
+    }
+  };
+
   useEffect(() => {
     contentRef.current = content;
-    if(saveRef){
+    if (saveRef) {
       saveRef.current = false;
-    }
-    else{
+    } else {
       saveRef.current = true;
     }
   }, [content]);
@@ -90,27 +146,65 @@ const Editor = () => {
           <div className="flex justify-between bg-violet-600 p-2">
             <div className="flex items-center">
               <button
-                className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded mr-2 focus:outline-none"
-                onClick={handleCopyToClipboard}
-              >
-                <FaClipboard />
-              </button>
-              <button
                 className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded focus:outline-none"
                 onClick={handleClean}
               >
                 <FaTrash />
               </button>
             </div>
+            <div className="flex">
+              <ToolbarButton
+                name="Bold"
+                onClick={() => handleStyling("bold")}
+              />
+              <ToolbarButton
+                name="Italic"
+                onClick={() => handleStyling("italic")}
+              />
+              <ToolbarButton
+                name="Underline"
+                onClick={() => handleStyling("underline")}
+              />
+              <ToolbarButton name="Link" onClick={handleLink} />
+              <ToolbarButton
+                name="Comment"
+                onClick={() => handleCommand("comment")}
+              />
+              <ToolbarButton
+                name="Indent"
+                onClick={() => handleCommand("quote")}
+              />
+              <ToolbarButton
+                name="Numberedlist"
+                onClick={() => handleList("enumerate")}
+              />
+              <ToolbarButton
+                name="Bulletedlist"
+                onClick={() => handleList("itemize")}
+              />
+              <ToolbarButton
+                name="Justifyright"
+                onClick={() => handleCommand("flushright")}
+              />
+              <ToolbarButton
+                name="Justifycenter"
+                onClick={() => handleCommand("center")}
+              />
+              <ToolbarButton
+                name="Justifyleft"
+                onClick={() => handleCommand("flushleft")}
+              />
+            </div>
           </div>
           <div className="editorContainer">
             <CodeMirror
+              ref={editorRef}
               className="CodeMirror"
               value={content}
               options={{
                 mode: "stex",
                 lineNumbers: true,
-                theme: 'base16-light',
+                theme: "base16-light",
               }}
               onBeforeChange={(editor, data, code) => {
                 setContent(code);
