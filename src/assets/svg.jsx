@@ -231,9 +231,7 @@ export const Underline = (props) => {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M7 12C7 14.2091 9.23858 16 12 16C14.7614 16 17 14.2091 17 12"
-      />
+      <path d="M7 12C7 14.2091 9.23858 16 12 16C14.7614 16 17 14.2091 17 12" />
       <line
         x1="7"
         y1="20"
@@ -269,7 +267,7 @@ export const Link = (props) => {
 };
 
 export const Undo = (props) => {
-  const { className } = props;
+  const { className, fill } = props;
   return (
     <svg
       width="19"
@@ -281,14 +279,14 @@ export const Undo = (props) => {
     >
       <path
         d="M7.4 1.77939C5.7 2.07939 4.2 2.67939 2.8 3.77939L0 0.879395V7.87939H7L4.3 5.17939C8 2.57939 13.1 3.37939 15.8 7.07939C16 7.37939 16.2 7.57939 16.3 7.87939L18.1 6.97939C15.9 3.17939 11.7 1.07939 7.4 1.77939Z"
-        fill="#0A0A0A"
+        fill={fill}
       />
     </svg>
   );
 };
 
 export const Redo = (props) => {
-  const { className } = props;
+  const { className, fill } = props;
   return (
     <svg
       width="18"
@@ -300,7 +298,7 @@ export const Redo = (props) => {
     >
       <path
         d="M10.6 1.77939C12.3 2.07939 13.8 2.67939 15.2 3.77939L18 0.879395V7.87939H11L13.7 5.17939C10 2.47939 4.9 3.37939 2.3 7.07939C2.1 7.37939 1.9 7.57939 1.8 7.87939L0 6.97939C2.1 3.17939 6.3 1.07939 10.6 1.77939Z"
-        fill="#0A0A0A"
+        fill={fill}
       />
     </svg>
   );

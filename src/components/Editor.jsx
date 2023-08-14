@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
 import { useEffect, useState, useRef } from "react";
-import { FaTrash } from "react-icons/fa";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import Output from "./Output";
 import RenderIf from "../extra/renderIf";
@@ -79,6 +78,16 @@ const Editor = () => {
     }
   };
 
+  const handleUndo = () => {
+    const editor = editorRef.current.editor;
+    editor.undo();
+  };
+
+  const handleRedo = () => {
+    const editor = editorRef.current.editor;
+    editor.redo();
+  };
+
   useEffect(() => {
     contentRef.current = content;
     if (saveRef) {
@@ -145,12 +154,15 @@ const Editor = () => {
         <div className="w-1/2 bg-violet-600 text-white flex flex-col flex-1">
           <div className="flex justify-between bg-violet-600 p-2">
             <div className="flex items-center">
-              <button
-                className="bg-transparent hover:bg-white hover:text-violet-900 text-violet-50 px-4 py-2 rounded focus:outline-none"
+              <ToolbarButton name="Undo" onClick={handleUndo} />
+              <ToolbarButton name="Redo" onClick={handleRedo} />
+              <ToolbarButton name="Erase" onClick={handleClean} />
+              {/* <div
+                className="bg-transparent cursor-pointer hover:bg-violet-900 p-2 rounded mr-2 focus:outline-none"
                 onClick={handleClean}
               >
-                <FaTrash />
-              </button>
+                <TbEraser/>
+              </div> */}
             </div>
             <div className="flex">
               <ToolbarButton
