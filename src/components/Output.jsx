@@ -6,9 +6,9 @@ import { RiFilePaper2Fill } from "react-icons/ri";
 import { HiDownload } from "react-icons/hi";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import RenderIf from "../renderif";
+import RenderIf from "../extra/renderIf";
 import html2pdf from "html2pdf.js";
-import { ESize, EPaper } from "./enum";
+import { ESize, EPaper } from "../extra/enum";
 
 const Output = ({ content, previewMode }) => {
   const [documentWidth, setDocumentWidth] = useState("75%");
@@ -55,11 +55,17 @@ const Output = ({ content, previewMode }) => {
 
       var completeHTML = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="en" style="scroll-behavior: smooth;">
         <head>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>latex output</title>
+          <link type="text/css" rel="stylesheet" href="https://latex.js.org/css/base.css">
+          <link type="text/css" rel="stylesheet" href="https://latex.js.org/css/katex.css">
+          <link type="text/css" rel="stylesheet" href="https://latex.js.org/css/article.css">
+          <link type="text/css" rel="stylesheet" href="https://latex.js.org/css/error.css">
+          <script src="https://latex.js.org/js/base.js"></script>
+          <script>document.addEventListener("DOMContentLoaded", function l(){for(var e=document.getElementsByTagName("a"),t=0;t<e.length;t++)e[t].getAttribute("href").startsWith("#")&&e[t].addEventListener("click",(function(e){e.preventDefault();var t=e.target.getAttribute("href").substr(1),r=document.getElementById(t);document.scrollingElement.scrollTop=offsetTop(r)}))})</script>
         </head>
         <body>
           <div class="main"
