@@ -4,6 +4,9 @@ import { Controlled as CodeMirror } from "react-codemirror2";
 import Output from "./Output";
 import RenderIf from "../extra/renderIf";
 import ToolbarButton from "../extra/toolbar/toolbarButton";
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { BiChevronDown } from "react-icons/bi";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/base16-light.css";
 import "codemirror/mode/stex/stex";
@@ -88,6 +91,15 @@ const Editor = () => {
     editor.redo();
   };
 
+  const handleDropdownChange = (element) => {
+    const editor = editorRef.current.editor;
+    const selectedText = editor.getSelection();
+    const modifiedText = selectedText
+      ? `\\${element}{${selectedText}}`
+      : `\\${element}{}`;
+    editor.replaceSelection(modifiedText);
+  };
+
   useEffect(() => {
     contentRef.current = content;
     if (saveRef) {
@@ -157,14 +169,110 @@ const Editor = () => {
               <ToolbarButton name="Undo" onClick={handleUndo} />
               <ToolbarButton name="Redo" onClick={handleRedo} />
               <ToolbarButton name="Erase" onClick={handleClean} />
-              {/* <div
-                className="bg-transparent cursor-pointer hover:bg-violet-900 p-2 rounded mr-2 focus:outline-none"
-                onClick={handleClean}
-              >
-                <TbEraser/>
-              </div> */}
             </div>
-            <div className="flex">
+            <div className="flex flex-wrap">
+              <Menu as="div" className="relative inline-block text-right">
+                <div>
+                  <Menu.Button className="inline-flex bg-transparent cursor-pointer hover:bg-violet-900 rounded focus:outline-none p-1 text-sm font-normal">
+                    Add element
+                    <BiChevronDown className="mt-1 ml-2"/>
+                  </Menu.Button>
+                </div>
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-100"
+                  enterFrom="transform opacity-0 scale-95"
+                  enterTo="transform opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="transform opacity-100 scale-100"
+                  leaveTo="transform opacity-0 scale-95"
+                >
+                  <Menu.Items className="absolute z-10 left-0 mt-2 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="px-1 py-1">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            onClick={() => {
+                              handleDropdownChange("section");
+                            }}
+                          >
+                            section
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            onClick={() => {
+                              handleDropdownChange("subsection");
+                            }}
+                          >
+                            subsection
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            onClick={() => {
+                              handleDropdownChange("subsubsection");
+                            }}
+                          >
+                            subsubsection
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            onClick={() => {
+                              handleDropdownChange("paragraph");
+                            }}
+                          >
+                            paragraph
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            className={`${
+                              active
+                                ? "bg-violet-500 text-white"
+                                : "text-gray-900"
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            onClick={() => {
+                              handleDropdownChange("subparagraph");
+                            }}
+                          >
+                            subparagraph
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                  </Menu.Items>
+                </Transition>
+              </Menu>
               <ToolbarButton
                 name="Bold"
                 onClick={() => handleStyling("bold")}

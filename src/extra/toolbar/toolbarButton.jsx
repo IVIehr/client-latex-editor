@@ -49,7 +49,7 @@ const ToolbarButton = ({ name, onClick }) => {
       size="small"
     >
       <div
-        className="bg-transparent cursor-pointer hover:bg-violet-900 p-2 rounded mr-2 focus:outline-none"
+        className="bg-transparent cursor-pointer hover:bg-violet-900 p-2 rounded mr-1 focus:outline-none"
         onClick={onClick}
       >
         <IconToRender
