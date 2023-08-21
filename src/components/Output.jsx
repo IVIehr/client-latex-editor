@@ -142,7 +142,7 @@ const Output = ({ content, previewMode }) => {
 
   return (
     <div className="h-screen bg-violet-50">
-      <div className="flex justify-end bg-violet-600 p-2">
+      <div className="flex justify-end bg-[#673AB7] p-2 h-12">
         <div>
           <RenderIf isTrue={previewMode}>
             <Menu as="div" className="relative inline-block text-right">

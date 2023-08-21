@@ -163,8 +163,8 @@ const Editor = () => {
   return (
     <div className="w-full flex">
       <RenderIf isTrue={!preview}>
-        <div className="w-1/2 bg-violet-600 text-white flex flex-col flex-1">
-          <div className="flex justify-between bg-violet-600 p-2">
+        <div className="w-1/2 text-white flex flex-col flex-1">
+          <div className="flex justify-between bg-[#673AB7] p-2 h-12">
             <div className="flex items-center">
               <ToolbarButton name="Undo" onClick={handleUndo} />
               <ToolbarButton name="Redo" onClick={handleRedo} />
@@ -196,7 +196,7 @@ const Editor = () => {
                               active
                                 ? "bg-violet-500 text-white"
                                 : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            } group flex w-full items-center rounded-md px-2 py-2 font-bold text-lg`}
                             onClick={() => {
                               handleDropdownChange("section");
                             }}
@@ -212,7 +212,7 @@ const Editor = () => {
                               active
                                 ? "bg-violet-500 text-white"
                                 : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            } group flex w-full items-center rounded-md px-2 py-2 font-bold`}
                             onClick={() => {
                               handleDropdownChange("subsection");
                             }}
@@ -228,7 +228,7 @@ const Editor = () => {
                               active
                                 ? "bg-violet-500 text-white"
                                 : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            } group flex w-full items-center rounded-md px-2 py-2 text-sm font-bold`}
                             onClick={() => {
                               handleDropdownChange("subsubsection");
                             }}
@@ -244,7 +244,7 @@ const Editor = () => {
                               active
                                 ? "bg-violet-500 text-white"
                                 : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                            } group flex w-full items-center rounded-md px-2 py-2`}
                             onClick={() => {
                               handleDropdownChange("paragraph");
                             }}
@@ -325,6 +325,7 @@ const Editor = () => {
                 mode: "stex",
                 lineNumbers: true,
                 theme: "base16-light",
+                lineWrapping: true
               }}
               onBeforeChange={(editor, data, code) => {
                 setContent(code);

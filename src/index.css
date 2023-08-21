@@ -59,7 +59,7 @@ button:focus-visible {
 }
 
 .CodeMirror {
-  min-height: calc(100vh - 65px);
+  min-height: calc(100vh - 45px);
 }
 
 @media (prefers-color-scheme: light) {
