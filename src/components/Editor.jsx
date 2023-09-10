@@ -101,7 +101,12 @@ const Editor = () => {
   };
 
   useEffect(() => {
-    contentRef.current = content;
+    const out = {
+      data: {
+        main: content,
+      },
+    };
+    contentRef.current = JSON.stringify(out);
     if (saveRef) {
       saveRef.current = false;
     } else {
@@ -128,6 +133,7 @@ const Editor = () => {
 
   const readEditorData = async (event) => {
     const { action, key, value } = event.data;
+    console.log("action", action);
     switch (action) {
       case "get-data":
         saveRef.current = true;
@@ -142,12 +148,14 @@ const Editor = () => {
         break;
       case "set-data":
         if (value) {
-          setContent(value);
+          const cnt = JSON.parse(value);
+          setContent(cnt.data.main);
         }
         break;
       case "load":
         if (value) {
-          setContent(value);
+          const cnt = JSON.parse(value);
+          setContent(cnt.data.main);
         }
         setPreview(true);
         break;
@@ -175,7 +183,7 @@ const Editor = () => {
                 <div>
                   <Menu.Button className="inline-flex bg-transparent cursor-pointer hover:bg-violet-900 rounded focus:outline-none p-1 text-sm font-normal">
                     Add element
-                    <BiChevronDown className="mt-1 ml-2"/>
+                    <BiChevronDown className="mt-1 ml-2" />
                   </Menu.Button>
                 </div>
                 <Transition
@@ -325,7 +333,7 @@ const Editor = () => {
                 mode: "stex",
                 lineNumbers: true,
                 theme: "base16-light",
-                lineWrapping: true
+                lineWrapping: true,
               }}
               onBeforeChange={(editor, data, code) => {
                 setContent(code);
@@ -334,7 +342,7 @@ const Editor = () => {
           </div>
         </div>
       </RenderIf>
-      <div className={`bg-gray-200 flex-1`}>
+      <div className="bg-gray-200 flex-1">
         <Output content={content} previewMode={preview} />
       </div>
     </div>
