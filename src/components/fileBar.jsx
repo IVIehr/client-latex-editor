@@ -37,6 +37,13 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
     });
   };
 
+  const handleInputBlur = () => {
+    if (editKey !== "") {
+      setEditKey(""); // Clear the editKey state
+      getContent(JSON.stringify(parsedContent));
+    }
+  };
+
   return (
     <div className="h-screen bg-purple-200 w-[13%] border-r-2 border-[#673AB7]">
       <div className="flex bg-[#673AB7] p-2 h-12">
@@ -68,9 +75,10 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
           {editKey === key ? (
             <input
               type="text"
-              value={editKey}
+              value={editKey || ""}
               onChange={(e) => handleInputChange(e, key)}
               autoFocus
+              onBlur={handleInputBlur} // Add this line
             />
           ) : (
             <span
