@@ -10,19 +10,19 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
   const [editKey, setEditKey] = useState("");
 
   const handleNewTemp = () => {
-    let newKey = "profile";
+    let newKey = "New File";
     let count = 1;
-  
+
     while (newKey in parsedContent) {
-      newKey = `profile${count}`;
+      newKey = `New File ${count}`;
       count++;
     }
-  
+
     const updatedContent = { ...parsedContent, [newKey]: " " };
     setParsedContent(updatedContent);
     getContent(JSON.stringify(updatedContent));
   };
-  
+
   const handleClickItem = (key) => {
     setSwitchContent(key);
   };
@@ -34,15 +34,19 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
   const handleInputChange = (e, oldKey) => {
     const newKey = e.target.value;
     setEditKey(newKey);
-    setParsedContent((prevState) => {
-      const updatedContent = { ...prevState };
-      updatedContent[newKey] = updatedContent[oldKey];
-      delete updatedContent[oldKey];
-      if (oldKey !== newKey) {
-        getContent(JSON.stringify(updatedContent));
-      }
-      return updatedContent;
-    });
+    if (newKey in parsedContent) {
+      alert("نام تکراری است");
+    } else {
+      setParsedContent((prevState) => {
+        const updatedContent = { ...prevState };
+        updatedContent[newKey] = updatedContent[oldKey];
+        delete updatedContent[oldKey];
+        if (oldKey !== newKey) {
+          getContent(JSON.stringify(updatedContent));
+        }
+        return updatedContent;
+      });
+    }
   };
 
   const handleInputBlur = () => {
