@@ -107,6 +107,12 @@ const Editor = () => {
     } else {
       saveRef.current = true;
     }
+
+    if (contentRef.current) {
+      const prevContent = JSON.parse(contentRef.current);
+      const updatedContent = { ...prevContent, main: content };
+      contentRef.current = JSON.stringify(updatedContent);
+    }
   }, [content]);
 
   useEffect(() => {
