@@ -72,17 +72,28 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
           onClick={() => handleClickItem(key)}
         >
           <DocIcon fill={"#673AB7"} className="w-6 my-2 mx-3" />
-          {editKey === key ? (
+          {editKey === key && key !== "main" ? (
             <input
               type="text"
               value={editKey || ""}
               onChange={(e) => handleInputChange(e, key)}
               autoFocus
-              onBlur={handleInputBlur} // Add this line
+              onBlur={handleInputBlur}
+              style={{
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                padding: "4px 8px",
+                margin: "3px",
+                fontSize: "14px",
+                outline: "none",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                boxSizing: "border-box",
+                width: "100%",
+              }}
             />
           ) : (
             <span
-              className="my-2 text-[#673AB7]"
+              className="my-2 mr-2 text-[#673AB7]"
               onDoubleClick={() => handleDoubleClick(key)}
             >
               {key}
