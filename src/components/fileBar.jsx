@@ -10,11 +10,19 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
   const [editKey, setEditKey] = useState("");
 
   const handleNewTemp = () => {
-    const updatedContent = { ...parsedContent, profile: " " };
+    let newKey = "profile";
+    let count = 1;
+  
+    while (newKey in parsedContent) {
+      newKey = `profile${count}`;
+      count++;
+    }
+  
+    const updatedContent = { ...parsedContent, [newKey]: " " };
     setParsedContent(updatedContent);
     getContent(JSON.stringify(updatedContent));
   };
-
+  
   const handleClickItem = (key) => {
     setSwitchContent(key);
   };
