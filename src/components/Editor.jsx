@@ -197,7 +197,7 @@ const Editor = () => {
   return (
     <>
       <RenderIf isTrue={!preview}>
-        <FileBar content={contentRef.current} getContent={handleNewTemp} setSwitchContent={setSwitchContent} />
+        <FileBar content={contentRef.current} getContent={handleNewTemp} setSwitchContent={setSwitchContent} switchContent={switchContent}/>
       </RenderIf>
       <div className="w-full flex">
         <RenderIf isTrue={!preview}>
