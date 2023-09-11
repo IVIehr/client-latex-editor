@@ -25,6 +25,7 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
 
   const handleInputChange = (e, oldKey) => {
     const newKey = e.target.value;
+    setEditKey(newKey);
     setParsedContent((prevState) => {
       const updatedContent = { ...prevState };
       updatedContent[newKey] = updatedContent[oldKey];
@@ -67,7 +68,7 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
           {editKey === key ? (
             <input
               type="text"
-              value={editKey || ""}
+              value={editKey}
               onChange={(e) => handleInputChange(e, key)}
               autoFocus
             />
