@@ -15,6 +15,7 @@ import "codemirror/mode/stex/stex";
 const Editor = () => {
   const [content, setContent] = useState("");
   const [preview, setPreview] = useState(true);
+  const [switchContent, setSwitchContent] = useState("main");
   const saveRef = useRef(null);
   const contentRef = useRef(null);
   const editorRef = useRef(null);
@@ -110,11 +111,18 @@ const Editor = () => {
 
     if (contentRef.current) {
       const prevContent = JSON.parse(contentRef.current);
-      const updatedContent = { ...prevContent, main: content };
+      const updatedContent = { ...prevContent, [switchContent]: content };
       contentRef.current = JSON.stringify(updatedContent);
     }
   }, [content]);
 
+  useEffect(() => {
+    if (contentRef.current) {
+      const prevContent = JSON.parse(contentRef.current);
+      setContent(prevContent[switchContent]);
+    }
+  }, [switchContent]);
+  
   useEffect(() => {
     window.addEventListener("message", readEditorData, false);
 
@@ -189,7 +197,7 @@ const Editor = () => {
   return (
     <>
       <RenderIf isTrue={!preview}>
-        <FileBar content={contentRef.current} getContent={handleNewTemp} />
+        <FileBar content={contentRef.current} getContent={handleNewTemp} setSwitchContent={setSwitchContent} />
       </RenderIf>
       <div className="w-full flex">
         <RenderIf isTrue={!preview}>

@@ -3,15 +3,19 @@ import { Tooltip } from "react-tippy";
 import { DocIcon, PlusCircleIcon } from "../assets/svg";
 import { useState } from "react";
 
-const FileBar = ({ content, getContent }) => {
+const FileBar = ({ content, getContent, setSwitchContent }) => {
   const initialContent = content ? JSON.parse(content) : {};
   const [parsedContent, setParsedContent] = useState(initialContent);
 
   const handleNewTemp = () => {
-    const updatedContent  = { ...parsedContent, sample: Math.random() };
+    const updatedContent  = { ...parsedContent, sample: " " };
     setParsedContent(updatedContent);
     getContent(JSON.stringify(updatedContent ));
   };
+
+  const handleClickItem = (key) => {
+    setSwitchContent(key);
+  }
 
   return (
     <div className="h-screen bg-purple-200 w-[13%] border-r-2 border-[#673AB7]">
@@ -38,6 +42,7 @@ const FileBar = ({ content, getContent }) => {
             className={`flex cursor-pointer hover:bg-[#bdb3d1] mb-1 ${
               key === "main" && "bg-[#bdb3d1]"
             }`}
+            onClick={() => handleClickItem(key)}
           >
             <DocIcon fill={"#673AB7"} className="w-6 my-2 mx-3" />
             <span className="my-2 text-[#673AB7]">{key}</span>
