@@ -1,21 +1,16 @@
 /* eslint-disable react/prop-types */
 import { Tooltip } from "react-tippy";
 import { DocIcon, PlusCircleIcon } from "../assets/svg";
-import { useRef } from "react";
+import { useState } from "react";
 
 const FileBar = ({ content, getContent }) => {
-  const parsedContent = useRef();
-
-  try {
-    parsedContent.current = JSON.parse(content);
-  } catch (error) {
-    console.error("Error parsing content:", error);
-  }
+  const initialContent = content ? JSON.parse(content) : {};
+  const [parsedContent, setParsedContent] = useState(initialContent);
 
   const handleNewTemp = () => {
-    const test = { ...parsedContent.current, profile: Math.random() };
-    parsedContent.current = test;
-    getContent(JSON.stringify(test));
+    const updatedContent  = { ...parsedContent, sample: Math.random() };
+    setParsedContent(updatedContent);
+    getContent(JSON.stringify(updatedContent ));
   };
 
   return (
@@ -37,19 +32,7 @@ const FileBar = ({ content, getContent }) => {
           </div>
         </Tooltip>
       </div>
-      {/* <div className="flex cursor-pointer hover:bg-[#bdb3d1] bg-[#bdb3d1] mb-1">
-        <DocIcon fill={"#673AB7"} className="w-6 my-2 mx-3" />
-        <span className="my-2 text-[#673AB7]">main.tex</span>
-      </div>
-      {parsedContent.current !== undefined &&
-        Object.keys(parsedContent.current).includes("profile") && (
-          <div className="flex cursor-pointer hover:bg-[#bdb3d1]">
-            <DocIcon fill={"#673AB7"} className="w-6 my-2 mx-3" />
-            <span className="my-2 text-[#673AB7]">profile.tex</span>
-          </div>
-        )} */}
-      {parsedContent.current &&
-        Object.keys(parsedContent.current).map((key, index) => (
+      {Object.keys(parsedContent).map((key, index) => (
           <div
             key={index}
             className={`flex cursor-pointer hover:bg-[#bdb3d1] mb-1 ${
