@@ -4,6 +4,7 @@ import Output from "./Output";
 import FileBar from "./fileBar";
 import RenderIf from "../extra/renderIf";
 import EditorComponent from "./editorComponent";
+import Resizable from "react-resizable-box";
 
 const Editor = () => {
   const [content, setContent] = useState("");
@@ -11,6 +12,11 @@ const Editor = () => {
   const [switchContent, setSwitchContent] = useState("main");
   const saveRef = useRef(null);
   const contentRef = useRef(null);
+  const resizableProps = {
+    width: 240,
+    minWidth: 240,
+    maxWidth: 400,
+  };
 
   useEffect(() => {
     if (saveRef) {
@@ -105,12 +111,14 @@ const Editor = () => {
   return (
     <>
       <RenderIf isTrue={!preview}>
-        <FileBar
-          content={contentRef.current}
-          getContent={handleNewTemp}
-          setSwitchContent={setSwitchContent}
-          switchContent={switchContent}
-        />
+        <Resizable {...resizableProps}>
+          <FileBar
+            content={contentRef.current}
+            getContent={handleNewTemp}
+            setSwitchContent={setSwitchContent}
+            switchContent={switchContent}
+          />
+        </Resizable>
       </RenderIf>
       <div className="w-full flex">
         <RenderIf isTrue={!preview}>

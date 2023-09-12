@@ -22,6 +22,7 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
     const updatedContent = { ...parsedContent, [newKey]: " " };
     setParsedContent(updatedContent);
     getContent(JSON.stringify(updatedContent));
+    handleClickItem(newKey);
   };
 
   const handleRemoveTemp = (key) => {
@@ -67,7 +68,7 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
   };
 
   return (
-    <div className="h-screen bg-purple-200 w-[13%] border-r-2 border-[#673AB7]">
+    <div className="h-screen bg-purple-200 border-r-2 border-[#673AB7]">
       <div className="flex bg-[#673AB7] p-2 h-12">
         <Tooltip
           title="Add template"
@@ -115,7 +116,7 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
             />
           ) : (
             <span
-              className="my-2 mr-2 text-[#673AB7] w-32"
+              className="my-2 mr-2 text-[#673AB7] w-full"
               onDoubleClick={() => handleDoubleClick(key)}
             >
               {key}
