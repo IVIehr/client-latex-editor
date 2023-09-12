@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import Output from "./Output";
+import FileBar from "./fileBar";
 import RenderIf from "../extra/renderIf";
 import ToolbarButton from "../extra/toolbar/toolbarButton";
 import { Menu, Transition } from "@headlessui/react";
@@ -14,6 +15,7 @@ import "codemirror/mode/stex/stex";
 const Editor = () => {
   const [content, setContent] = useState("");
   const [preview, setPreview] = useState(true);
+  const [switchContent, setSwitchContent] = useState("main");
   const saveRef = useRef(null);
   const contentRef = useRef(null);
   const editorRef = useRef(null);
@@ -101,14 +103,26 @@ const Editor = () => {
   };
 
   useEffect(() => {
-    contentRef.current = content;
     if (saveRef) {
       saveRef.current = false;
     } else {
       saveRef.current = true;
     }
+
+    if (contentRef.current) {
+      const prevContent = JSON.parse(contentRef.current);
+      const updatedContent = { ...prevContent, [switchContent]: content };
+      contentRef.current = JSON.stringify(updatedContent);
+    }
   }, [content]);
 
+  useEffect(() => {
+    if (contentRef.current) {
+      const prevContent = JSON.parse(contentRef.current);
+      setContent(prevContent[switchContent]);
+    }
+  }, [switchContent]);
+  
   useEffect(() => {
     window.addEventListener("message", readEditorData, false);
 
@@ -128,6 +142,7 @@ const Editor = () => {
 
   const readEditorData = async (event) => {
     const { action, key, value } = event.data;
+    console.log("action", action);
     switch (action) {
       case "get-data":
         saveRef.current = true;
@@ -142,12 +157,26 @@ const Editor = () => {
         break;
       case "set-data":
         if (value) {
-          setContent(value);
+          const cnt = JSON.parse(value);
+          setContent(cnt.main);
+          contentRef.current = value;
+        } else {
+          const out = {
+            main: "",
+          };
+          contentRef.current = JSON.stringify(out);
         }
         break;
       case "load":
         if (value) {
-          setContent(value);
+          const cnt = JSON.parse(value);
+          setContent(cnt.main);
+          contentRef.current = value;
+        } else {
+          const out = {
+            main: "",
+          };
+          contentRef.current = JSON.stringify(out);
         }
         setPreview(true);
         break;
@@ -160,184 +189,193 @@ const Editor = () => {
     }
   };
 
+  const handleNewTemp = (cnt) => {
+    contentRef.current = cnt;
+  };
+
   return (
-    <div className="w-full flex">
+    <>
       <RenderIf isTrue={!preview}>
-        <div className="w-1/2 text-white flex flex-col flex-1">
-          <div className="flex justify-between bg-[#673AB7] p-2 h-12">
-            <div className="flex items-center">
-              <ToolbarButton name="Undo" onClick={handleUndo} />
-              <ToolbarButton name="Redo" onClick={handleRedo} />
-              <ToolbarButton name="Erase" onClick={handleClean} />
-            </div>
-            <div className="flex flex-wrap">
-              <Menu as="div" className="relative inline-block text-right">
-                <div>
-                  <Menu.Button className="inline-flex bg-transparent cursor-pointer hover:bg-violet-900 rounded focus:outline-none p-1 text-sm font-normal">
-                    Add element
-                    <BiChevronDown className="mt-1 ml-2"/>
-                  </Menu.Button>
-                </div>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
-                >
-                  <Menu.Items className="absolute z-10 left-0 mt-2 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div className="px-1 py-1">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 font-bold text-lg`}
-                            onClick={() => {
-                              handleDropdownChange("section");
-                            }}
-                          >
-                            section
-                          </button>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 font-bold`}
-                            onClick={() => {
-                              handleDropdownChange("subsection");
-                            }}
-                          >
-                            subsection
-                          </button>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm font-bold`}
-                            onClick={() => {
-                              handleDropdownChange("subsubsection");
-                            }}
-                          >
-                            subsubsection
-                          </button>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2`}
-                            onClick={() => {
-                              handleDropdownChange("paragraph");
-                            }}
-                          >
-                            paragraph
-                          </button>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button
-                            className={`${
-                              active
-                                ? "bg-violet-500 text-white"
-                                : "text-gray-900"
-                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                            onClick={() => {
-                              handleDropdownChange("subparagraph");
-                            }}
-                          >
-                            subparagraph
-                          </button>
-                        )}
-                      </Menu.Item>
-                    </div>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
-              <ToolbarButton
-                name="Bold"
-                onClick={() => handleStyling("bold")}
-              />
-              <ToolbarButton
-                name="Italic"
-                onClick={() => handleStyling("italic")}
-              />
-              <ToolbarButton
-                name="Underline"
-                onClick={() => handleStyling("underline")}
-              />
-              <ToolbarButton name="Link" onClick={handleLink} />
-              <ToolbarButton
-                name="Comment"
-                onClick={() => handleCommand("comment")}
-              />
-              <ToolbarButton
-                name="Indent"
-                onClick={() => handleCommand("quote")}
-              />
-              <ToolbarButton
-                name="Numberedlist"
-                onClick={() => handleList("enumerate")}
-              />
-              <ToolbarButton
-                name="Bulletedlist"
-                onClick={() => handleList("itemize")}
-              />
-              <ToolbarButton
-                name="Justifyright"
-                onClick={() => handleCommand("flushright")}
-              />
-              <ToolbarButton
-                name="Justifycenter"
-                onClick={() => handleCommand("center")}
-              />
-              <ToolbarButton
-                name="Justifyleft"
-                onClick={() => handleCommand("flushleft")}
-              />
-            </div>
-          </div>
-          <div className="editorContainer">
-            <CodeMirror
-              ref={editorRef}
-              className="CodeMirror"
-              value={content}
-              options={{
-                mode: "stex",
-                lineNumbers: true,
-                theme: "base16-light",
-                lineWrapping: true
-              }}
-              onBeforeChange={(editor, data, code) => {
-                setContent(code);
-              }}
-            />
-          </div>
-        </div>
+        <FileBar content={contentRef.current} getContent={handleNewTemp} setSwitchContent={setSwitchContent} switchContent={switchContent}/>
       </RenderIf>
-      <div className={`bg-gray-200 flex-1`}>
-        <Output content={content} previewMode={preview} />
+      <div className="w-full flex">
+        <RenderIf isTrue={!preview}>
+          <div className="w-1/2 text-white flex flex-col flex-1">
+            <div className="flex justify-between bg-[#673AB7] p-2 h-12">
+              <div className="flex items-center">
+                <ToolbarButton name="Undo" onClick={handleUndo} />
+                <ToolbarButton name="Redo" onClick={handleRedo} />
+                <ToolbarButton name="Erase" onClick={handleClean} />
+              </div>
+              <div className="flex flex-wrap">
+                <Menu as="div" className="relative inline-block text-right">
+                  <div>
+                    <Menu.Button className="inline-flex bg-transparent cursor-pointer hover:bg-violet-900 rounded focus:outline-none p-1 text-sm font-normal">
+                      Add element
+                      <BiChevronDown className="mt-1 ml-2" />
+                    </Menu.Button>
+                  </div>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute z-10 left-0 mt-2 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="px-1 py-1">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              className={`${
+                                active
+                                  ? "bg-violet-500 text-white"
+                                  : "text-gray-900"
+                              } group flex w-full items-center rounded-md px-2 py-2 font-bold text-lg`}
+                              onClick={() => {
+                                handleDropdownChange("section");
+                              }}
+                            >
+                              section
+                            </button>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              className={`${
+                                active
+                                  ? "bg-violet-500 text-white"
+                                  : "text-gray-900"
+                              } group flex w-full items-center rounded-md px-2 py-2 font-bold`}
+                              onClick={() => {
+                                handleDropdownChange("subsection");
+                              }}
+                            >
+                              subsection
+                            </button>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              className={`${
+                                active
+                                  ? "bg-violet-500 text-white"
+                                  : "text-gray-900"
+                              } group flex w-full items-center rounded-md px-2 py-2 text-sm font-bold`}
+                              onClick={() => {
+                                handleDropdownChange("subsubsection");
+                              }}
+                            >
+                              subsubsection
+                            </button>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              className={`${
+                                active
+                                  ? "bg-violet-500 text-white"
+                                  : "text-gray-900"
+                              } group flex w-full items-center rounded-md px-2 py-2`}
+                              onClick={() => {
+                                handleDropdownChange("paragraph");
+                              }}
+                            >
+                              paragraph
+                            </button>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              className={`${
+                                active
+                                  ? "bg-violet-500 text-white"
+                                  : "text-gray-900"
+                              } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                              onClick={() => {
+                                handleDropdownChange("subparagraph");
+                              }}
+                            >
+                              subparagraph
+                            </button>
+                          )}
+                        </Menu.Item>
+                      </div>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
+                <ToolbarButton
+                  name="Bold"
+                  onClick={() => handleStyling("bold")}
+                />
+                <ToolbarButton
+                  name="Italic"
+                  onClick={() => handleStyling("italic")}
+                />
+                <ToolbarButton
+                  name="Underline"
+                  onClick={() => handleStyling("underline")}
+                />
+                <ToolbarButton name="Link" onClick={handleLink} />
+                <ToolbarButton
+                  name="Comment"
+                  onClick={() => handleCommand("comment")}
+                />
+                <ToolbarButton
+                  name="Indent"
+                  onClick={() => handleCommand("quote")}
+                />
+                <ToolbarButton
+                  name="Numberedlist"
+                  onClick={() => handleList("enumerate")}
+                />
+                <ToolbarButton
+                  name="Bulletedlist"
+                  onClick={() => handleList("itemize")}
+                />
+                <ToolbarButton
+                  name="Justifyright"
+                  onClick={() => handleCommand("flushright")}
+                />
+                <ToolbarButton
+                  name="Justifycenter"
+                  onClick={() => handleCommand("center")}
+                />
+                <ToolbarButton
+                  name="Justifyleft"
+                  onClick={() => handleCommand("flushleft")}
+                />
+              </div>
+            </div>
+            <div className="editorContainer">
+              <CodeMirror
+                ref={editorRef}
+                className="CodeMirror"
+                value={content}
+                options={{
+                  mode: "stex",
+                  lineNumbers: true,
+                  theme: "base16-light",
+                  lineWrapping: true,
+                }}
+                onBeforeChange={(editor, data, code) => {
+                  setContent(code);
+                }}
+              />
+            </div>
+          </div>
+        </RenderIf>
+        <div className="bg-gray-200 flex-1">
+          <Output content={content} previewMode={preview} contentObject={contentRef.current} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 export default Editor;

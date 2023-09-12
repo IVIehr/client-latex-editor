@@ -10,12 +10,14 @@ import RenderIf from "../extra/renderIf";
 import html2pdf from "html2pdf.js";
 import { ESize, EPaper } from "../extra/enum";
 
-const Output = ({ content, previewMode }) => {
+const Output = ({ content, previewMode, contentObject }) => {
   const [documentWidth, setDocumentWidth] = useState("75%");
   const [documentHeight, setDocumentHeight] = useState("20cm");
   const [size, setSize] = useState(EPaper.A4);
   let generator = new HtmlGenerator({ hyphenate: false });
   const iframeRef = useRef(null);
+  const contentRef = useRef();
+  const [outputContent, setOutputContent] = useState(content);
 
   useEffect(() => {
     if (!previewMode) {
@@ -24,6 +26,32 @@ const Output = ({ content, previewMode }) => {
       setSize(EPaper.A4);
     }
   }, [previewMode]);
+
+  useEffect(() => {
+    setOutputContent(content);
+    contentRef.current = content;
+    const regex = /\\input\{([^}]+)\}/g;
+    const matches = [];
+    let match;
+    while ((match = regex.exec(content)) !== null) {
+      matches.push(match[1]);
+    }
+    if (contentObject && matches.length !== 0) {
+      const object = JSON.parse(contentObject);
+      for (const [key, value] of Object.entries(object)) {
+        if (matches.includes(key)) {
+          const replacedContent = contentRef.current.replace(
+            `\\input{${key}}`,
+            () => {
+              return value;
+            }
+          );
+          setOutputContent(replacedContent);
+          contentRef.current = replacedContent;
+        }
+      }
+    }
+  }, [content, contentObject]);
 
   const resize = (paper) => {
     setDocumentWidth(paper.width);
@@ -36,14 +64,14 @@ const Output = ({ content, previewMode }) => {
     return span.textContent || span.innerText;
   };
 
-  const finalHTML = () => {
-    let direction = extractText(content);
+  const finalHTML = (outputText) => {
+    let direction = extractText(outputText);
     const HTMLDirection =
       stringDirection.getDirection(direction) === "ltr" ? "ltr" : "rtl";
 
     try {
       // Parse latex to HTML
-      let outputToHTML = parse(content, {
+      let outputToHTML = parse(outputText, {
         generator: generator,
       }).htmlDocument();
 
@@ -86,7 +114,6 @@ const Output = ({ content, previewMode }) => {
       </html>`;
 
       return completeHTML;
-
     } catch (error) {
       const errorBody = `<h4 style="color: red;">${error}</h4>`;
       if (error.location) {
@@ -247,7 +274,7 @@ const Output = ({ content, previewMode }) => {
         ref={iframeRef}
         className="output-frame w-full h-full border-0"
         title="Output"
-        srcDoc={finalHTML()}
+        srcDoc={finalHTML(outputContent)}
       ></iframe>
     </div>
   );
