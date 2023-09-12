@@ -10,12 +10,13 @@ import RenderIf from "../extra/renderIf";
 import html2pdf from "html2pdf.js";
 import { ESize, EPaper } from "../extra/enum";
 
-const Output = ({ content, previewMode }) => {
+const Output = ({ content, previewMode, contentObject }) => {
   const [documentWidth, setDocumentWidth] = useState("75%");
   const [documentHeight, setDocumentHeight] = useState("20cm");
   const [size, setSize] = useState(EPaper.A4);
   let generator = new HtmlGenerator({ hyphenate: false });
   const iframeRef = useRef(null);
+  const [outputContent, setOutputContent] = useState(content);
 
   useEffect(() => {
     if (!previewMode) {
@@ -24,6 +25,30 @@ const Output = ({ content, previewMode }) => {
       setSize(EPaper.A4);
     }
   }, [previewMode]);
+
+  useEffect(() => {
+    setOutputContent(content);
+    const regex = /\\input\{([^}]+)\}/g;
+    const matches = [];
+    let match;
+    while ((match = regex.exec(content)) !== null) {
+      matches.push(match[1]);
+    }
+    if (contentObject && matches.length !== 0) {
+      const object = JSON.parse(contentObject);
+      for (const [key, value] of Object.entries(object)) {
+        if (matches.includes(key)) {
+          console.log(`Key: ${key}, Value: ${value}`);
+          // Replace specific text
+          const replacedContent = content.replace(`\\input{${key}}`, () => {
+            return value;
+          });
+          setOutputContent(replacedContent);
+          console.log("outputcontent", outputContent);
+        }
+      }
+    }
+  }, [content, contentObject]);
 
   const resize = (paper) => {
     setDocumentWidth(paper.width);
@@ -43,7 +68,7 @@ const Output = ({ content, previewMode }) => {
 
     try {
       // Parse latex to HTML
-      let outputToHTML = parse(content, {
+      let outputToHTML = parse(outputContent, {
         generator: generator,
       }).htmlDocument();
 
@@ -86,7 +111,6 @@ const Output = ({ content, previewMode }) => {
       </html>`;
 
       return completeHTML;
-
     } catch (error) {
       const errorBody = `<h4 style="color: red;">${error}</h4>`;
       if (error.location) {

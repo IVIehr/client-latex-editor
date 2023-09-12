@@ -373,7 +373,7 @@ const Editor = () => {
           </div>
         </RenderIf>
         <div className="bg-gray-200 flex-1">
-          <Output content={content} previewMode={preview} />
+          <Output content={content} previewMode={preview} contentObject={contentRef.current} />
         </div>
       </div>
     </>
