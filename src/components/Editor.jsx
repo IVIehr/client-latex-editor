@@ -191,7 +191,6 @@ const Editor = () => {
 
   const handleNewTemp = (cnt) => {
     contentRef.current = cnt;
-    console.log("new content", cnt);
   };
 
   return (

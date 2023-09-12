@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 import { Tooltip } from "react-tippy";
-import { DocIcon, PlusCircleIcon } from "../assets/svg";
+import { DeleteIcon, DocIcon, PlusCircleIcon } from "../assets/svg";
 import { useState } from "react";
+import RenderIf from "../extra/renderIf";
 
 const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
   const initialContent = content ? JSON.parse(content) : {};
@@ -21,6 +22,15 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
     const updatedContent = { ...parsedContent, [newKey]: " " };
     setParsedContent(updatedContent);
     getContent(JSON.stringify(updatedContent));
+  };
+
+  const handleRemoveTemp = (key) => {
+    setParsedContent((prevState) => {
+      const updatedContent = { ...prevState };
+      delete updatedContent[key];
+      getContent(JSON.stringify(updatedContent));
+      return updatedContent;
+    });
   };
 
   const handleClickItem = (key) => {
@@ -105,12 +115,17 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
             />
           ) : (
             <span
-              className="my-2 mr-2 text-[#673AB7]"
+              className="my-2 mr-2 text-[#673AB7] w-32"
               onDoubleClick={() => handleDoubleClick(key)}
             >
               {key}
             </span>
           )}
+          <RenderIf isTrue={switchContent === key && key !== "main"}>
+            <div className="m-2" onClick={() => handleRemoveTemp(key)}>
+              <DeleteIcon className="w-5" fill="#6b2525" />
+            </div>
+          </RenderIf>
         </div>
       ))}
     </div>
