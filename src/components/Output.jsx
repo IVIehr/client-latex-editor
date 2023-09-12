@@ -16,6 +16,7 @@ const Output = ({ content, previewMode, contentObject }) => {
   const [size, setSize] = useState(EPaper.A4);
   let generator = new HtmlGenerator({ hyphenate: false });
   const iframeRef = useRef(null);
+  const contentRef = useRef();
   const [outputContent, setOutputContent] = useState(content);
 
   useEffect(() => {
@@ -28,6 +29,7 @@ const Output = ({ content, previewMode, contentObject }) => {
 
   useEffect(() => {
     setOutputContent(content);
+    contentRef.current = content;
     const regex = /\\input\{([^}]+)\}/g;
     const matches = [];
     let match;
@@ -38,13 +40,14 @@ const Output = ({ content, previewMode, contentObject }) => {
       const object = JSON.parse(contentObject);
       for (const [key, value] of Object.entries(object)) {
         if (matches.includes(key)) {
-          console.log(`Key: ${key}, Value: ${value}`);
-          // Replace specific text
-          const replacedContent = content.replace(`\\input{${key}}`, () => {
-            return value;
-          });
+          const replacedContent = contentRef.current.replace(
+            `\\input{${key}}`,
+            () => {
+              return value;
+            }
+          );
           setOutputContent(replacedContent);
-          console.log("outputcontent", outputContent);
+          contentRef.current = replacedContent;
         }
       }
     }
@@ -61,14 +64,14 @@ const Output = ({ content, previewMode, contentObject }) => {
     return span.textContent || span.innerText;
   };
 
-  const finalHTML = () => {
-    let direction = extractText(content);
+  const finalHTML = (outputText) => {
+    let direction = extractText(outputText);
     const HTMLDirection =
       stringDirection.getDirection(direction) === "ltr" ? "ltr" : "rtl";
 
     try {
       // Parse latex to HTML
-      let outputToHTML = parse(outputContent, {
+      let outputToHTML = parse(outputText, {
         generator: generator,
       }).htmlDocument();
 
@@ -271,7 +274,7 @@ const Output = ({ content, previewMode, contentObject }) => {
         ref={iframeRef}
         className="output-frame w-full h-full border-0"
         title="Output"
-        srcDoc={finalHTML()}
+        srcDoc={finalHTML(outputContent)}
       ></iframe>
     </div>
   );
