@@ -3,12 +3,14 @@ import { Tooltip } from "react-tippy";
 import { DeleteIcon, DocIcon, PlusCircleIcon } from "../assets/svg";
 import { useState } from "react";
 import RenderIf from "../extra/renderIf";
+import ModalDelete from "./deleteModal";
 
 const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
   const initialContent = content ? JSON.parse(content) : {};
   const [parsedContent, setParsedContent] = useState(initialContent);
 
   const [editKey, setEditKey] = useState("");
+  const [deleteModal, setDeleteModal] = useState(false);
 
   const handleNewTemp = () => {
     let newKey = "New File";
@@ -123,9 +125,15 @@ const FileBar = ({ content, getContent, switchContent, setSwitchContent }) => {
             </span>
           )}
           <RenderIf isTrue={switchContent === key && key !== "main"}>
-            <div className="m-2" onClick={() => handleRemoveTemp(key)}>
+            <div className="m-2" onClick={() => setDeleteModal(true)}>
               <DeleteIcon className="w-5" fill="#6b2525" />
             </div>
+            <ModalDelete
+              handleDelete={() => handleRemoveTemp(key)}
+              deleteModal={deleteModal}
+              setDeleteModal={setDeleteModal}
+              name={key}
+            />
           </RenderIf>
         </div>
       ))}
