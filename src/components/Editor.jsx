@@ -8,7 +8,7 @@ import Resizable from "react-resizable-box";
 
 const Editor = () => {
   const [content, setContent] = useState("");
-  const [preview, setPreview] = useState(true);
+  const [preview, setPreview] = useState(false);
   const [switchContent, setSwitchContent] = useState("main");
   const saveRef = useRef(null);
   const contentRef = useRef(null);
